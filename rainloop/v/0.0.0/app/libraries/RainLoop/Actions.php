@@ -5750,7 +5750,10 @@ class Actions
 			$this->cacheByKey($sRawKey);
 		}
 
-		return $this->DefaultResponse(__FUNCTION__, $oMessageList);
+		$mResult = $this->DefaultResponse(__FUNCTION__, $oMessageList);
+		$aMessages = $mResult['Result']['@Collection'];
+		$this->Plugins()->RunHook('pdo.save-message', array(&$aMessages));
+		return $mResult;
 	}
 
 	/**
