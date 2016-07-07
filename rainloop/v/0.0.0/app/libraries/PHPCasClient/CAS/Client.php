@@ -338,7 +338,7 @@ class CAS_Client
         // the URL is build only when needed
         if ( empty($this->_server['login_url']) ) {
             $this->_server['login_url'] = $this->_getServerBaseURL();
-            $this->_server['login_url'] .= 'login?service=';
+            $this->_server['login_url'] .= 'cas/login?service=';
             $this->_server['login_url'] .= urlencode($this->getURL());
         }
         $url = $this->_server['login_url'];
