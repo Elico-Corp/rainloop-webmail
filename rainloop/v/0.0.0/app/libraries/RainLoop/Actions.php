@@ -964,7 +964,6 @@ class Actions
 	 */
 	public function MessageProvider()
 	{
-		Chromephp::log("1. ");
 		if (null === $this->oMessageProvider)
 		{
 			$oDriver = $this->fabrica('message');
@@ -5803,7 +5802,7 @@ class Actions
 		$this->Plugins()->RunHook('pdo.save-message', &$oMessageList);
 		$oMessageProvider = $this->MessageProvider();
 		$oResult = $oMessageProvider->syncMessageList($oMessageList);
-
+		
 		return $this->DefaultResponse(__FUNCTION__, $oMessageList);
 	}
 
