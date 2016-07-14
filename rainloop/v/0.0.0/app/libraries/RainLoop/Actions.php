@@ -3453,19 +3453,25 @@ class Actions
 	 */
 	public function DoLogout()
 	{
-		$oAccount = $this->getAccountFromToken(false);
-		if ($oAccount)
-		{
-			if ($oAccount->SignMe())
-			{
-				$this->ClearSignMeData($oAccount);
-			}
+		// $oAccount = $this->getAccountFromToken(false);
+		// if ($oAccount)
+		// {
+		// 	if ($oAccount->SignMe())
+		// 	{
+		// 		$this->ClearSignMeData($oAccount);
+		// 	}
 
-			if (!$oAccount->IsAdditionalAccount())
-			{
-				\RainLoop\Utils::ClearCookie(\RainLoop\Actions::AUTH_SPEC_TOKEN_KEY);
-			}
-		}
+		// 	if (!$oAccount->IsAdditionalAccount())
+		// 	{
+		// 		\RainLoop\Utils::ClearCookie(\RainLoop\Actions::AUTH_SPEC_TOKEN_KEY);
+		// 	}
+		// }
+		
+		// [fix] noah force clean all cookies
+		\RainLoop\Utils::ClearCookie('rlsession');
+		\RainLoop\Utils::ClearCookie('rltoken');
+		\RainLoop\Utils::ClearCookie('session_id');
+
 		$this->Plugins()->RunHook('service.after-logout');
 
 		return $this->TrueResponse(__FUNCTION__);
