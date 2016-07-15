@@ -28,14 +28,11 @@ class PdoMessagePlugin extends \RainLoop\Plugins\AbstractPlugin
 		{
 			return 'The PHP exention PDO (mysql) must be installed to use this plugin';
 		}
-		\Rainloop\ChromePhp::log('Supported');
 		return '';
 	}
 
 	public function PdoSaveMessage(&$aMessages, &$oProvider)
 	{
-		\Rainloop\ChromePhp::log('PdoSaveMessage');
-
 		if (True)
 		{
 			include_once __DIR__.'/SaveMessageDriver.php';
@@ -44,7 +41,6 @@ class PdoMessagePlugin extends \RainLoop\Plugins\AbstractPlugin
 			$sPassword = (string) $this->Config()->Get('contacts', 'pdo_password', '12345');
 			$sDsnType = 'mysql';
 			// $sDsnType = $this->ValidateContactPdoType(\trim($this->Config()->Get('contacts', 'type', 'sqlite')));
-			\Rainloop\ChromePhp::log($sDsn);
 			$oProvider = new SaveMessageDriver($sDsn, $sUser, $sPassword, $sDsnType);
 			foreach ($aMessages as $oMessage) {
 				$oProvider->MailSave2($oMessage);
