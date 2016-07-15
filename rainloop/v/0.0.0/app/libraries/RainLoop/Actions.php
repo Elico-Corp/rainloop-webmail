@@ -2154,6 +2154,7 @@ class Actions
 		$this->Logger()->AddSecret($sPassword);
 
 		$sLogin = $sEmail;
+		$this->Plugins()->RunHook('filter.login-credentials.cas-login', array(&$sEmail, &$sLogin, &$sPassword));
 		$this->Plugins()->RunHook('filter.login-credentials', array(&$sEmail, &$sLogin, &$sPassword));
 
 		$this->Logger()->AddSecret($sPassword);
@@ -2315,8 +2316,11 @@ class Actions
 
 		$oAccount = null;
 
+		$sLogin = $sEmail;
 		$sPassword = $this->clientRsaDecryptHelper($sPassword);
 		$this->Logger()->AddSecret($sPassword);
+		$this->Plugins()
+			->RunHook('filter.pre-do-login', array($sLogin, &$sEmail, &$sPassword));
 
 		if (0 < \strlen($sEmail) && 0 < \strlen($sPassword) &&
 			$this->Config()->Get('security', 'allow_universal_login', true) &&
@@ -3462,6 +3466,7 @@ class Actions
 				\RainLoop\Utils::ClearCookie(\RainLoop\Actions::AUTH_SPEC_TOKEN_KEY);
 			}
 		}
+		$this->Plugins()->RunHook('service.after-logout');
 
 		return $this->TrueResponse(__FUNCTION__);
 	}
@@ -6448,6 +6453,9 @@ class Actions
 						$aArrayToFrec[$oEmail->GetEmail(true)] = $oEmail->ToString(false, true);
 					}
 				}
+				$aArrayContactEmail = array($oMessage->MessageId(), $oMessage->GetSubject(), \time());
+
+				$this->AddressBookProvider($oAccount)->saveLastEmail($oAccount->ParentEmailHelper(), $aArrayContactEmail, $aArrayToFrec);
 
 				if (0 < \count($aArrayToFrec))
 				{

@@ -819,6 +819,51 @@ class PdoAddressBook
 
 	/**
 	 * @param string $sEmail
+	 * @param array $aArrayContactEmails
+	 * @param array $aArrayEmails
+	 *
+	 * @return bool
+	 */
+	public function saveLastEmail($sEmail, $aArrayContactEmails, $aArrayEmails)
+	{
+		$ids_contact = $this->getContactIdsFromEmail($sEmail, $aArrayEmails);
+		$sSql = "UPDATE rainloop_ab_contacts SET last_email_id = \"{$aArrayContactEmails[0]}\"".
+		            ", last_email_subject = \"{$aArrayContactEmails[1]}\"".
+		            ", last_email_date = $aArrayContactEmails[2]";
+		$sSql .= ' WHERE id_contact IN ('.\implode(',', array_values($ids_contact)).')';
+		
+		$oStmt = $this->prepareAndExecute($sSql);
+		return true;
+	}
+
+	/**
+	 * @param string $sEmail
+	 * @param array $aArrayEmails
+	 *
+	 * @return array
+	 */
+	public function getContactIdsFromEmail($sEmail, $aArrayEmails)
+	{
+
+		$iUserID = $this->getUserId($sEmail);
+
+		$sSql = 'SELECT id_contact FROM rainloop_ab_properties WHERE id_user = :id_user AND prop_type = :prop_type';
+		$sSql .= ' AND prop_value IN ("'.\implode('","', \array_keys($aArrayEmails)).'")';
+		
+		$oStmt = $this->prepareAndExecute($sSql, array(
+			':id_user' => array($iUserID, \PDO::PARAM_INT),
+			':prop_type' => array(PropertyType::EMAIl, \PDO::PARAM_INT)
+		));
+		
+		$aFetch = $oStmt->fetchAll(\PDO::FETCH_ASSOC);
+		$id_contacts = array_map(function($item){
+			    return $item['id_contact'];
+			}, \array_values($aFetch));
+		return $id_contacts;
+	}
+
+	/**
+	 * @param string $sEmail
 	 * @param string $sType = 'vcf'
 	 *
 	 * @return bool
@@ -1901,6 +1946,13 @@ SQLITEINITIAL;
 'ALTER TABLE rainloop_ab_properties CHANGE prop_value prop_value TEXT NOT NULL;',
 'ALTER TABLE rainloop_ab_properties CHANGE prop_value_custom prop_value_custom TEXT NOT NULL;',
 'ALTER TABLE rainloop_ab_properties CHANGE prop_value_lower prop_value_lower TEXT NOT NULL;'
+					),
+
+					4 => array(
+'ALTER TABLE rainloop_ab_contacts ADD id_odoo int UNSIGNED NOT NULL DEFAULT 0 AFTER etag;',
+'ALTER TABLE rainloop_ab_contacts ADD last_email_date int UNSIGNED NOT NULL DEFAULT 0 AFTER etag;',
+'ALTER TABLE rainloop_ab_contacts ADD last_email_id varchar(64) NOT NULL DEFAULT \'\' AFTER etag;',
+'ALTER TABLE rainloop_ab_contacts ADD last_email_subject varchar(255) NOT NULL DEFAULT \'\' AFTER etag;'
 					)
 				));
 				break;

@@ -172,6 +172,18 @@ class AddressBook extends \RainLoop\Providers\AbstractProvider
 	}
 
 	/**
+	 * @param string $sEmail
+	 * @param array $aArrayContactEmails
+	 * @param array $aArrayEmails
+	 *
+	 * @return bool
+	 */
+	public function saveLastEmail($sEmail, $aArrayContactEmails, $aArrayEmails)
+	{
+		return $this->IsActive() ? $this->oDriver->saveLastEmail($sEmail, $aArrayContactEmails, $aArrayEmails) : false;
+	}
+
+	/**
 	 * @param string $sCsvName
 	 *
 	 * @return int
