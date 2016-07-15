@@ -71,7 +71,6 @@ implements CAS_Request_RequestInterface
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
-        phpCAS :: log(var_dump($ch) . ' [' . basename($dbg[0]['file']) . ':' . $dbg[0]['line'] . ']');
         /*********************************************************
          * Perform the query
         *********************************************************/

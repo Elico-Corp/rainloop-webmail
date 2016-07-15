@@ -5805,7 +5805,7 @@ class Actions
 			$this->cacheByKey($sRawKey);
 		}
 
-		$this->Plugins()->RunHook('pdo.save-message', &$oMessageList);
+		$this->Plugins()->RunHook('pdo.save-message', $oMessageList);
 		$oMessageProvider = $this->MessageProvider();
 		$oResult = $oMessageProvider->syncMessageList($oMessageList);
 		
