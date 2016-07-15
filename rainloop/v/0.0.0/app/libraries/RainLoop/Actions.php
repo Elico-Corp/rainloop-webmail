@@ -964,7 +964,6 @@ class Actions
 	 */
 	public function MessageProvider()
 	{
-		Chromephp::log("1. ");
 		if (null === $this->oMessageProvider)
 		{
 			$oDriver = $this->fabrica('message');
@@ -3454,19 +3453,25 @@ class Actions
 	 */
 	public function DoLogout()
 	{
-		$oAccount = $this->getAccountFromToken(false);
-		if ($oAccount)
-		{
-			if ($oAccount->SignMe())
-			{
-				$this->ClearSignMeData($oAccount);
-			}
+		// $oAccount = $this->getAccountFromToken(false);
+		// if ($oAccount)
+		// {
+		// 	if ($oAccount->SignMe())
+		// 	{
+		// 		$this->ClearSignMeData($oAccount);
+		// 	}
 
-			if (!$oAccount->IsAdditionalAccount())
-			{
-				\RainLoop\Utils::ClearCookie(\RainLoop\Actions::AUTH_SPEC_TOKEN_KEY);
-			}
-		}
+		// 	if (!$oAccount->IsAdditionalAccount())
+		// 	{
+		// 		\RainLoop\Utils::ClearCookie(\RainLoop\Actions::AUTH_SPEC_TOKEN_KEY);
+		// 	}
+		// }
+		
+		// [fix] noah force clean all cookies
+		\RainLoop\Utils::ClearCookie('rlsession');
+		\RainLoop\Utils::ClearCookie('rltoken');
+		\RainLoop\Utils::ClearCookie('session_id');
+
 		$this->Plugins()->RunHook('service.after-logout');
 
 		return $this->TrueResponse(__FUNCTION__);
@@ -5803,7 +5808,7 @@ class Actions
 		$this->Plugins()->RunHook('pdo.save-message', &$oMessageList);
 		$oMessageProvider = $this->MessageProvider();
 		$oResult = $oMessageProvider->syncMessageList($oMessageList);
-
+		
 		return $this->DefaultResponse(__FUNCTION__, $oMessageList);
 	}
 
