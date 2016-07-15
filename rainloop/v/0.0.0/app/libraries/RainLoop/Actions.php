@@ -96,6 +96,11 @@ class Actions
 	private $oAddressBookProvider;
 
 	/**
+	 * @var \RainLoop\Providers\Message
+	 */
+	private $oMessageProvider;
+
+	/**
 	 * @var \RainLoop\Providers\Suggestions
 	 */
 	private $oSuggestionsProvider;
@@ -148,6 +153,7 @@ class Actions
 		$this->oFiltersProvider = null;
 		$this->oDomainProvider = null;
 		$this->oAddressBookProvider = null;
+		$this->oMessageProvider = null;
 		$this->oSuggestionsProvider = null;
 		$this->oChangePasswordProvider = null;
 		$this->oTwoFactorAuthProvider = null;
@@ -316,6 +322,25 @@ class Actions
 					{
 						$mResult = new \RainLoop\Providers\AddressBook\PdoAddressBook($sDsn, $sUser, $sPassword, $sDsnType);
 					}
+					break;
+				case 'message':
+					// \RainLoop\Providers\Message\MessageInterface
+
+					$sDsn = \trim($this->Config()->Get('contacts', 'pdo_dsn', ''));
+					$sUser = \trim($this->Config()->Get('contacts', 'pdo_user', ''));
+					$sPassword = (string) $this->Config()->Get('contacts', 'pdo_password', '');
+
+					$sDsnType = $this->ValidateContactPdoType(\trim($this->Config()->Get('contacts', 'type', 'sqlite')));
+					if ('sqlite' === $sDsnType)
+					{
+						$mResult = new \RainLoop\Providers\Message\PdoMessage(
+							'sqlite:'.APP_PRIVATE_DATA.'Message.sqlite', '', '', 'sqlite');
+					}
+					else
+					{
+						$mResult = new \RainLoop\Providers\Message\PdoMessage($sDsn, $sUser, $sPassword, $sDsnType);
+					}
+
 					break;
 				case 'suggestions':
 
@@ -929,6 +954,25 @@ class Actions
 		}
 
 		return $this->oAddressBookProvider;
+	}
+
+	/**
+	 * @param \RainLoop\Model\Account $oAccount = null
+	 * @param bool $bForceEnable = false
+	 *
+	 * @return \RainLoop\Providers\Message
+	 */
+	public function MessageProvider()
+	{
+		Chromephp::log("1. ");
+		if (null === $this->oMessageProvider)
+		{
+			$oDriver = $this->fabrica('message');
+			$this->oMessageProvider = new \RainLoop\Providers\Message($oDriver);
+			$this->oMessageProvider->SetLogger($this->Logger());
+		}
+
+		return $this->oMessageProvider;
 	}
 
 	/**
@@ -5750,10 +5794,11 @@ class Actions
 			$this->cacheByKey($sRawKey);
 		}
 
-		$mResult = $this->DefaultResponse(__FUNCTION__, $oMessageList);
-		$aMessages = $mResult['Result']['@Collection'];
-		$this->Plugins()->RunHook('pdo.save-message', array(&$aMessages));
-		return $mResult;
+		$this->Plugins()->RunHook('pdo.save-message', &$oMessageList);
+		$oMessageProvider = $this->MessageProvider();
+		$oResult = $oMessageProvider->syncMessageList($oMessageList);
+
+		return $this->DefaultResponse(__FUNCTION__, $oMessageList);
 	}
 
 	/**
