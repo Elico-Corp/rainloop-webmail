@@ -338,7 +338,7 @@ class CAS_Client
         // the URL is build only when needed
         if ( empty($this->_server['login_url']) ) {
             $this->_server['login_url'] = $this->_getServerBaseURL();
-            $this->_server['login_url'] .= 'login?service=';
+            $this->_server['login_url'] .= 'cas/login?service=';
             $this->_server['login_url'] .= urlencode($this->getURL());
         }
         $url = $this->_server['login_url'];
@@ -436,15 +436,15 @@ class CAS_Client
             switch ($this->getServerVersion()) {
             case CAS_VERSION_1_0:
                 $this->_server['service_validate_url'] = $this->_getServerBaseURL()
-                .'validate';
+                .'cas/validate';
                 break;
             case CAS_VERSION_2_0:
                 $this->_server['service_validate_url'] = $this->_getServerBaseURL()
-                .'serviceValidate';
+                .'cas/serviceValidate';
                 break;
             case CAS_VERSION_3_0:
                 $this->_server['service_validate_url'] = $this->_getServerBaseURL()
-                .'p3/serviceValidate';
+                .'cas/p3/serviceValidate';
                 break;
             }
         }
@@ -467,7 +467,7 @@ class CAS_Client
         if ( empty($this->_server['saml_validate_url']) ) {
             switch ($this->getServerVersion()) {
             case SAML_VERSION_1_1:
-                $this->_server['saml_validate_url'] = $this->_getServerBaseURL().'samlValidate';
+                $this->_server['saml_validate_url'] = $this->_getServerBaseURL().'cas/samlValidate';
                 break;
             }
         }
@@ -492,13 +492,13 @@ class CAS_Client
         if ( empty($this->_server['proxy_validate_url']) ) {
             switch ($this->getServerVersion()) {
             case CAS_VERSION_1_0:
-                $this->_server['proxy_validate_url'] = '';
+                $this->_server['proxy_validate_url'] = 'cas';
                 break;
             case CAS_VERSION_2_0:
-                $this->_server['proxy_validate_url'] = $this->_getServerBaseURL().'proxyValidate';
+                $this->_server['proxy_validate_url'] = $this->_getServerBaseURL().'cas/proxyValidate';
                 break;
             case CAS_VERSION_3_0:
-                $this->_server['proxy_validate_url'] = $this->_getServerBaseURL().'p3/proxyValidate';
+                $this->_server['proxy_validate_url'] = $this->_getServerBaseURL().'cas/p3/proxyValidate';
                 break;
             }
         }
@@ -522,11 +522,11 @@ class CAS_Client
         if ( empty($this->_server['proxy_url']) ) {
             switch ($this->getServerVersion()) {
             case CAS_VERSION_1_0:
-                $this->_server['proxy_url'] = '';
+                $this->_server['proxy_url'] = 'cas';
                 break;
             case CAS_VERSION_2_0:
             case CAS_VERSION_3_0:
-                $this->_server['proxy_url'] = $this->_getServerBaseURL().'proxy';
+                $this->_server['proxy_url'] = $this->_getServerBaseURL().'cas/proxy';
                 break;
             }
         }
@@ -542,7 +542,7 @@ class CAS_Client
     {
         // the URL is build only when needed
         if ( empty($this->_server['logout_url']) ) {
-            $this->_server['logout_url'] = $this->_getServerBaseURL().'logout';
+            $this->_server['logout_url'] = $this->_getServerBaseURL().'cas/logout';
         }
         return $this->_server['logout_url'];
     }
@@ -3132,7 +3132,7 @@ class CAS_Client
         $dom->preserveWhiteSpace = false;
         // CAS servers should only return data in utf-8
         $dom->encoding = "utf-8";
-        // read the response of the CAS server into a DOMDocument object
+	// read the response of the CAS server into a DOMDocument object
         if ( !($dom->loadXML($text_response))) {
             // read failed
             throw new CAS_AuthenticationException(
