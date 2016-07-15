@@ -2165,7 +2165,8 @@ class Actions
 
 		try
 		{
-			$oAccount = $this->LoginProvide($sEmail, $sLogin, $sPassword, $sSignMeToken, true);
+			// noah change line below to fix the dovecot login issue
+			$oAccount = $this->LoginProvide($sEmail, $sEmail, $sPassword, $sSignMeToken, true);
 
 			if (!($oAccount instanceof \RainLoop\Model\Account))
 			{
